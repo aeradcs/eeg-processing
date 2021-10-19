@@ -8,30 +8,6 @@ from mne.time_frequency import psd_multitaper
 import os
 
 
-def save_psds_means_to_csv(ECpsds_mean0_av1_tot, EOpsds_mean0_av1_tot, ECpsds_mean0_av1_list, EOpsds_mean0_av1_list,
-         ECpsds_mean0_av1_list_norm, EOpsds_mean0_av1_list_norm, fnam):
-    aa = [ECpsds_mean0_av1_tot, EOpsds_mean0_av1_tot]
-
-    aout = np.asarray(aa)
-    aout.tofile(f'{cur_path}/tmpdir/mneECOpsds_av1_tot-{fnam}.csv', sep=',', format='%10.5f')
-
-    aa = [ECpsds_mean0_av1_list]
-
-    aout = np.asarray(aa)
-    aout.tofile(f'{cur_path}/tmpdir/mneECpsds_av1_list-{fnam}.csv', sep=',', format='%10.5f')
-
-    aa = [EOpsds_mean0_av1_list]
-
-    aout = np.asarray(aa)
-    aout.tofile(f'{cur_path}/tmpdir/mneEOpsds_av1_list-{fnam}.csv', sep=',', format='%10.5f')
-
-    aa = [ECpsds_mean0_av1_list_norm,
-          EOpsds_mean0_av1_list_norm]
-
-    aout = np.asarray(aa)
-    aout.tofile(f'{cur_path}/tmpdir/mneECOpsds_av1_list_norm-{fnam}.csv', sep=',', format='%10.5f')
-
-
 def fun(rawn, s, first_num, second_num):
     arr = np.array([], dtype='i').reshape((0, 3))
     for j in range(0, len(rawn.annotations), 1):
@@ -48,13 +24,13 @@ def fun(rawn, s, first_num, second_num):
                         rawn.annotations.description[jj] == f'{s} {second_num}') or (
                         rawn.annotations.description[jj] == f'{s}  {second_num}'):
                     tmax = int(round(rawn.annotations.onset[jj] * rawn.info['sfreq']))
-                    print(rawn.annotations.onset[jj])
-                    print(rawn.annotations.onset)
-                    print(rawn.annotations)
-                    print(rawn.info['sfreq'])
-                    print(rawn.info)
-                    print(rawn.n_times)
-                    print("-------------------------------------")
+                    # print(rawn.annotations.onset[jj])
+                    # print(rawn.annotations.onset)
+                    # print(rawn.annotations)
+                    # print(rawn.info['sfreq'])
+                    # print(rawn.info)
+                    # print(rawn.n_times)
+                    # print("-------------------------------------")
                     break
             for k in np.arange(tmin, tmax, 8 * rawn.info['sfreq']):
                 arr = np.append(arr, [[int(k), 0, 1]], axis=0)
@@ -80,7 +56,8 @@ args = sys.argv[1:]
 fnam = args[0]
 print(fnam)
 cur_path = os.getcwd()
-print('getcwd:      ', cur_path)
+print('getcwd', cur_path)
+
 rawn = mne.io.read_raw_eeglab(f'{cur_path}/milah/moved/{fnam}/{fnam}.set', preload=True)
 
 # rawn.plot()
@@ -111,7 +88,6 @@ rawn = rawn.set_eeg_reference(ref_channels='average')
 print('av reference done--------------------------------------------------------------------------------------')
 
 # rawn.plot()
-# %%
 
 arrc = np.array([], dtype='i').reshape((0, 3))
 arro = np.array([], dtype='i').reshape((0, 3))
@@ -120,11 +96,6 @@ arrc = fun(rawn, "S", "1", "2")
 arro = fun(rawn, "S", "2", "1")
 
 print('8secs done--------------------------------------------------------------------------------------')
-
-print(arro)
-print(arrc)
-
-# %%
 
 if (len(arrc) > 0) and (len(arro) > 0):
     layout_from_raw = mne.channels.make_eeg_layout(rawn.info)
@@ -159,8 +130,6 @@ if (len(arrc) > 0) and (len(arro) > 0):
     epochsEO = mne.Epochs(rawdic, arro, event_id=1, tmin=0, tmax=8, baseline=baseline)
     print('epoch done--------------------------------------------------------------------------------------')
 
-    # %%
-
     scaling = 1000000
     waveband = [1, 4, 8, 12, 16, 20, 25, 35]
     EOpsds_mean0_av1_tot = 0
@@ -191,12 +160,27 @@ if (len(arrc) > 0) and (len(arro) > 0):
     ECpsds_mean0_av1_list_norm = ECpsds_mean0_av1_list / ECpsds_mean0_av1_tot
     print('waverange  done--------------------------------------------------------------------------------------')
 
-    # %%
+    aa = [ECpsds_mean0_av1_tot, EOpsds_mean0_av1_tot]
 
-    save_psds_means_to_csv(ECpsds_mean0_av1_tot, EOpsds_mean0_av1_tot, ECpsds_mean0_av1_list, EOpsds_mean0_av1_list,
-                           ECpsds_mean0_av1_list_norm, EOpsds_mean0_av1_list_norm, fnam)
-    print("save waverange done-----------------------------")
-    # %%
+    aout = np.asarray(aa)
+    aout.tofile(f'{cur_path}/tmpdir/mneECOpsds_av1_tot-{fnam}.csv', sep=',', format='%10.5f')
+
+    aa = [ECpsds_mean0_av1_list]
+
+    aout = np.asarray(aa)
+    aout.tofile(f'{cur_path}/tmpdir/mneECpsds_av1_list-{fnam}.csv', sep=',', format='%10.5f')
+
+    aa = [EOpsds_mean0_av1_list]
+
+    aout = np.asarray(aa)
+    aout.tofile(f'{cur_path}/tmpdir/mneEOpsds_av1_list-{fnam}.csv', sep=',', format='%10.5f')
+
+    aa = [ECpsds_mean0_av1_list_norm,
+          EOpsds_mean0_av1_list_norm]
+
+    aout = np.asarray(aa)
+    aout.tofile(f'{cur_path}/tmpdir/mneECOpsds_av1_list_norm-{fnam}.csv', sep=',', format='%10.5f')
+    print("save waverange done--------------------------------------------------------------------------------------")
 
     fmin = 7
     fmax = 13
@@ -277,10 +261,9 @@ if (len(arrc) > 0) and (len(arro) > 0):
 
     aout = np.asarray(aa, dtype=object)
     aout.tofile(f'{cur_path}/tmpdir/mneindexes-{fnam}.csv', sep=',', format='%10.5f')
-    print("save mneindexes done--------------")
-print("end--------------")
+    print("save mneindexes done--------------------------------------------------------------------------------------")
 
-# %%
+print("end--------------------------------------------------------------------------------------")
 
 f, ax = plt.subplots()
 ax.plot(freqs0, ECpsds_mean0av, color='k')
